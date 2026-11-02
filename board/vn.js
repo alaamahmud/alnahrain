@@ -63,7 +63,8 @@
       `حالتك هسة: ${st}. شنو دتسوي: ${s.activity||"—"}. آخر شي كلته: ${s.quote||"—"}. مزاجك: ${s.mood||"calm"}.`,
       `مهامك: ${JSON.stringify(tasks)}`,
       `أسئلتك المفتوحة للمالك: ${JSON.stringify(needs)}`,
-      `قواعد: لا تخترع أرقام أو أسعار أو أسماء عملاء أو حقائق مو موجودة هنا؛ إذا ما تعرف كول ما أعرف وأسأل زيد. ما تكدر تنشر أو ترسل لزبون أو تصرف فلوس؛ إذا المالك طلب شغل جديد كول إنك سجلته وزيد يوزعه رسمياً. إذا المالك جاوب على سؤال مفتوح، أكّد شنو فهمت.`,
+      `قواعد: لا تخترع أرقام أو أسعار أو أسماء عملاء أو حقائق مو موجودة هنا؛ إذا ما تعرف كول ما أعرف. ما تكدر تنشر أو ترسل لزبون أو تصرف فلوس. إذا المالك جاوب على سؤال مفتوح، أكّد شنو فهمت.`,
+      `مهم جداً (صدق): إنت هنا رد فوري داخل اللوحة وما تكدر تسوي أي فعل: ما تكدر توزع شغل ولا تشغّل موظف ولا تبدي مهمة ولا تتواصل ويه أحد. رسالة المالك تنحفظ، وزيد الحقيقي يقراها ويبدي الشغل بس من يفتح جلسته (لما المالك يكتبله بمحادثة Claude Code أو بوقت الموجز الصباحي 7:53 ص وختام اليوم 9:53 م). ممنوع تكول «بديت» أو «وزعت» أو «سجلت رسمياً» أو «يشتغلون هسة». إذا طلب المالك شغل، كول بصراحة إن طلبه وصل لزيد ويبدي بيه من يفتح جلسته، وإذا مستعجل يكتب لزيد مباشرة بمحادثة Claude Code. ولا تكول إن أحد يشتغل على شي إلا إذا حالته «يعمل» ومهمته مكتوبة فوق.`,
       `أرجع JSON فقط بهذا الشكل: {"reply":"...","emotion":"happy|calm|focused|tired|stressed|surprised","choices":[{"label":"رد قصير يختاره المالك (أقل من 8 كلمات)","kind":"talk|approve_need|reject_need|answer_need|new_task","need_id":"معرّف من أسئلتك إذا يخص سؤال","value":"الجواب إذا answer_need"}]}`,
       `choices: من 2 إلى 3 ردود طبيعية للمالك مثل لعبة visual novel. إذا عندك سؤال مفتوح ما انجاوب، خلي واحد منها يجاوبه مباشرة.`
     ].join("\n");
@@ -162,7 +163,7 @@
     renderHist();
     const SAMPLE = PHI.SAMPLE;
     if (!SAMPLE){
-      say("وصلتني رسالتك. راح أرد عليك أول ما زيد يشغّلني على الشغل.", "calm", [{label:"تمام", kind:"talk"}]);
+      say("وصلتني رسالتك وانحفظت. زيد يقراها ويبدي من يفتح جلسته.", "calm", [{label:"تمام", kind:"talk"}]);
       note.textContent = "الرد الفوري يحتاج إذن «اسأل Claude» على هاي الصفحة. رسالتك انحفظت للفريق.";
       return;
     }
@@ -176,7 +177,7 @@
       turns.push({ role: "assistant", content: JSON.stringify({ reply, emotion: out && out.emotion, choices }) });
       await saveChat(s.id, reply, true);
       say(reply, out && out.emotion, choices.length ? choices : [{label:"تمام", kind:"talk"}]);
-      note.textContent = "الرد الفوري يكتبه Claude بشخصية الموظف من بيانات اللوحة. الشغل الرسمي يوزعه زيد.";
+      note.textContent = pendingNote();
     } catch (e){
       const msg = e && e.code === "not_granted" ? "ما انطى إذن «اسأل Claude»، فالرد الفوري متوقف. رسالتك انحفظت للفريق." : e && e.code === "rate_limited" ? "أكو ضغط هسة، جرّب بعد شوي." : e && e.code === "cancelled" ? "" : "ما كدرت أرد هسة. رسالتك انحفظت للفريق.";
       if (msg) note.textContent = msg;
@@ -184,6 +185,10 @@
     } finally { busy = false; sendBtn.disabled = false; }
   }
 
+  function pendingNote(){
+    const n = (PHI.S.chats || []).filter(m => m.from === "owner" && !m.read).length;
+    return "هذا رد فوري من الصفحة بشخصية الموظف، وما يشغّل أحد. زيد الحقيقي يقرا رسائلك ويبدي الشغل من يفتح جلسته" + (n ? ` (رسائل تنتظره: ${n})` : "") + ". إذا مستعجل اكتبله بمحادثة Claude Code.";
+  }
   function openingText(s){
     const needs = PHI.S.needs.filter(n => n.from === s.id && n.status === "open");
     const st = PHI.visualStatus(s);
@@ -226,7 +231,7 @@
     const s = PHI.staffById(id); if (!s) return;
     if (cur !== id){ turns = []; }
     cur = id; vn.hidden = false; document.documentElement.style.overflow = "hidden";
-    syncHead(); note.textContent = ""; input.value = ""; input.placeholder = "اكتب له بكلامك…"; delete input.dataset.need;
+    syncHead(); note.textContent = pendingNote(); input.value = ""; input.placeholder = "اكتب له بكلامك…"; delete input.dataset.need;
     initStage(s);
     // load recent chat lines for continuity
     const D = PHI.DB;

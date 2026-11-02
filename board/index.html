@@ -327,7 +327,7 @@ function tickClock(){ const n = new Date(); $("clock").textContent = fT.format(n
 tickClock(); setInterval(tickClock, 15000);
 
 /* ---------- state ---------- */
-const S = { staff:[], events:[], tasks:[], needs:[], meetings:[], inbox:[], sel:null, canWrite:null, loaded:{} };
+const S = { staff:[], events:[], tasks:[], needs:[], meetings:[], inbox:[], chats:[], sel:null, canWrite:null, loaded:{} };
 function visualStatus(s){
   if (s.status === "off") return "off";
   const d = toD(s.updated_at);
@@ -1007,6 +1007,7 @@ $("compose").addEventListener("submit", async (ev) => {
   sub("needs", db.collection("needs"));
   sub("meetings", db.collection("meetings").orderBy("started_at","desc").limit(3));
   sub("inbox", db.collection("inbox").orderBy("at","desc").limit(30));
+  sub("chats", db.collection("chats").where("read","==",false).limit(100));
 })();
 setInterval(() => { renderTeam(); renderTally(); }, 60000);
 let SAMPLE = null;
