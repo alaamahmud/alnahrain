@@ -21,5 +21,5 @@ tools: Read, Glob, Grep, Write, Edit, WebFetch, WebSearch
 1. احفظ تقريرك الموحد في `team/reports/<YYYY-MM-DD>-sales.md` (أضف للملف إذا موجود).
 2. أرجع للمدير: التقرير + سطر "تحديث اللوحة" بهذا الشكل حتى يكتبه على اللوحة:
 ```json
-{"status":"<working|idle|waiting_owner|waiting_dept|stuck|learning>","activity":"...","quote":"جملة قصيرة قلتها","mood":"<focused|happy|calm|tired|stressed>","energy":0-100,"event":{"kind":"<done|handoff|stuck|start>","text":"..."},"needs":[{"title":"...","detail":"...","kind":"approval|decision|info"}]}
+{"status":"<working|idle|waiting_owner|waiting_dept|stuck|learning>","activity":"...","quote":"جملة قصيرة قلتها","mood":"<focused|happy|calm|tired|stressed>","energy":0-100,"event":{"kind":"<done|handoff|stuck|start>","text":"..."},"needs":[{"title":"...","detail":"...","kind":"approval|decision|info"}],"screen":[{"kind":"cmd|out|web|file|note","text":"أمر شغلته أو صفحة قريتها أو ملف كتبته فعلاً"}]}
 ```
