@@ -44,6 +44,7 @@
   document.body.append(term);
 
   /* ---------- state ---------- */
+  let woke = false;
   let cur = null, turns = [], busy = false, ctl = null, typing = null, talkingUntil = 0, emotion = "calm";
   let r3 = null; // three renderer bundle
   const staff = () => cur && PHI.staffById(cur);
@@ -64,7 +65,7 @@
       `مهامك: ${JSON.stringify(tasks)}`,
       `أسئلتك المفتوحة للمالك: ${JSON.stringify(needs)}`,
       `قواعد: لا تخترع أرقام أو أسعار أو أسماء عملاء أو حقائق مو موجودة هنا؛ إذا ما تعرف كول ما أعرف. ما تكدر تنشر أو ترسل لزبون أو تصرف فلوس. إذا المالك جاوب على سؤال مفتوح، أكّد شنو فهمت.`,
-      `مهم جداً (صدق): إنت هنا رد فوري داخل اللوحة وما تكدر تسوي أي فعل: ما تكدر توزع شغل ولا تشغّل موظف ولا تبدي مهمة ولا تتواصل ويه أحد. رسالة المالك تنحفظ، وزيد الحقيقي يقراها ويبدي الشغل بس من يفتح جلسته (لما المالك يكتبله بمحادثة Claude Code أو بوقت الموجز الصباحي 7:53 ص وختام اليوم 9:53 م). ممنوع تكول «بديت» أو «وزعت» أو «سجلت رسمياً» أو «يشتغلون هسة». إذا طلب المالك شغل، كول بصراحة إن طلبه وصل لزيد ويبدي بيه من يفتح جلسته، وإذا مستعجل يكتب لزيد مباشرة بمحادثة Claude Code. ولا تكول إن أحد يشتغل على شي إلا إذا حالته «يعمل» ومهمته مكتوبة فوق.`,
+      `مهم جداً (صدق): إنت هنا رد فوري داخل اللوحة وما تكدر تسوي أي فعل: ما تكدر توزع شغل ولا تشغّل موظف ولا تبدي مهمة ولا تتواصل ويه أحد. رسالة المالك تنحفظ وتنرسل لزيد الحقيقي، وهو اللي يقراها ويوزع الشغل بجلسته. ممنوع تكول «بديت» أو «وزعت» أو «سجلت رسمياً» أو «يشتغلون هسة». إذا طلب المالك شغل، كول بصراحة إن طلبه انرسل لزيد وهو يوزعه، وإنت تنتظر توجيهه. ولا تكول إن أحد يشتغل على شي إلا إذا حالته «يعمل» ومهمته مكتوبة فوق.`,
       `أرجع JSON فقط بهذا الشكل: {"reply":"...","emotion":"happy|calm|focused|tired|stressed|surprised","choices":[{"label":"رد قصير يختاره المالك (أقل من 8 كلمات)","kind":"talk|approve_need|reject_need|answer_need|new_task","need_id":"معرّف من أسئلتك إذا يخص سؤال","value":"الجواب إذا answer_need"}]}`,
       `choices: من 2 إلى 3 ردود طبيعية للمالك مثل لعبة visual novel. إذا عندك سؤال مفتوح ما انجاوب، خلي واحد منها يجاوبه مباشرة.`
     ].join("\n");
@@ -128,6 +129,19 @@
   }
   function say(reply, emo, choices){ emotion = EMO.includes(emo) ? emo : "calm"; typeText(reply, () => setChoices(choices)); renderHist(); }
 
+  let COMMENTS = null; (async () => { try { COMMENTS = await (window.claude && window.claude.use ? window.claude.use("comments") : null); } catch (e) { COMMENTS = null; } })();
+  async function wakeZaid(text){
+    const s = staff(); if (!s) return false;
+    try {
+      if (!COMMENTS) return false;
+      const can = await COMMENTS.canSendToClaude();
+      if (can !== "available") return false;
+      const anchor = await COMMENTS.anchorFor(document.getElementById("hTeam") || nameTag);
+      await COMMENTS.sendToClaude({ anchor, text: `[رسالة من المالك إلى ${s.name} (${s.id}) عبر شاشة الحوار] ${text}` });
+      return true;
+    } catch (e) { return false; }
+  }
+  window.PHIWake = async (text) => { try { if (!COMMENTS) return false; if (await COMMENTS.canSendToClaude() !== "available") return false; const anchor = await COMMENTS.anchorFor(document.getElementById("hMeet")); await COMMENTS.sendToClaude({ anchor, text }); return true; } catch (e) { return false; } };
   async function saveChat(from, text, generated, extra){
     const D = PHI.DB; if (!D || !cur) return;
     try { await D.collection("chats").add(Object.assign({ staff: cur, from, text, at: new Date().toISOString(), generated: !!generated, read: from !== "owner" }, extra || {})); } catch (e) {}
@@ -150,17 +164,18 @@
         await decide(need.id, ch.kind === "approve_need" ? "approved" : ch.kind === "reject_need" ? "rejected" : "answered", ch.kind === "answer_need" ? ch.value : ch.label);
         note.textContent = `انحفظ قرارك على «${need.title}» باللوحة.`;
       } catch (e){ note.textContent = "ما انحفظ القرار. جرّب من قسم «ينتظر قرارك»."; return; }
-      return send(`${ch.label} (قرار المالك على: ${need.title})`);
+      return send(`${ch.label} (قرار المالك على: ${need.title})`, null, true);
     }
-    if (ch.kind === "new_task") return send(ch.label, { needs_ceo: true });
+    if (ch.kind === "new_task") return send(ch.label, { needs_ceo: true }, true);
     return send(ch.label);
   }
 
-  async function send(text, extra){
+  async function send(text, extra, wake){
     const s = staff(); if (!s || !text) return;
     turns.push({ role: "user", content: text });
     await saveChat("owner", text, false, extra);
     renderHist();
+    if (wake){ wakeZaid(text).then(ok => { woke = ok; note.textContent = ok ? "⚡ وصلت لزيد هسة، وراح يبدي بيها بجلسته." : pendingNote(); }); }
     const SAMPLE = PHI.SAMPLE;
     if (!SAMPLE){
       say("وصلتني رسالتك وانحفظت. زيد يقراها ويبدي من يفتح جلسته.", "calm", [{label:"تمام", kind:"talk"}]);
@@ -177,7 +192,7 @@
       turns.push({ role: "assistant", content: JSON.stringify({ reply, emotion: out && out.emotion, choices }) });
       await saveChat(s.id, reply, true);
       say(reply, out && out.emotion, choices.length ? choices : [{label:"تمام", kind:"talk"}]);
-      note.textContent = pendingNote();
+      note.textContent = woke ? "⚡ وصلت لزيد هسة. الرد هنا فوري من الصفحة، والشغل الحقيقي يبديه زيد." : pendingNote();
     } catch (e){
       const msg = e && e.code === "not_granted" ? "ما انطى إذن «اسأل Claude»، فالرد الفوري متوقف. رسالتك انحفظت للفريق." : e && e.code === "rate_limited" ? "أكو ضغط هسة، جرّب بعد شوي." : e && e.code === "cancelled" ? "" : "ما كدرت أرد هسة. رسالتك انحفظت للفريق.";
       if (msg) note.textContent = msg;
@@ -257,9 +272,9 @@
     if (needId){
       const need = PHI.S.needs.find(n => n.id === needId);
       try { await decide(needId, "answered", v); note.textContent = `انحفظ جوابك على «${need ? need.title : needId}».`; } catch (err){ note.textContent = "ما انحفظ الجواب على اللوحة."; }
-      return send(`${v} (جواب المالك على: ${need ? need.title : needId})`);
+      return send(`${v} (جواب المالك على: ${need ? need.title : needId})`, null, true);
     }
-    send(v);
+    send(v, null, true);
   });
   addEventListener("keydown", (e) => { if (e.key === "Escape"){ if (!term.hidden) closeScreen(); else if (!vn.hidden) close(); } });
 

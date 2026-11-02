@@ -981,7 +981,7 @@ $("compose").addEventListener("submit", async (ev) => {
   const live = S.meetings.find(m => m.status === "live");
   try {
     await DB.collection("inbox").add({ text, at: new Date().toISOString(), meeting_id: live ? live.id : "", read: false });
-    ta.value = ""; $("composeNote").textContent = "وصلت. زيد يقرأها بأول جلسة ويحوّلها لمهام.";
+    ta.value = ""; const ok = window.PHIWake ? await window.PHIWake("[رسالة من المالك لزيد من قاعة الاجتماعات] " + text) : false; $("composeNote").textContent = ok ? "⚡ وصلت لزيد هسة، وراح يبدي بيها بجلسته." : "وصلت. زيد يقرأها بأول جلسة ويحوّلها لمهام.";
   } catch(e){
     $("composeNote").textContent = e && e.code === "invalid_argument" ? "ما عندك صلاحية الكتابة على هاي اللوحة." : e && e.code === "quota_exceeded" ? "اللوحة امتلأت. اطلب من زيد يحذف الرسائل القديمة." : "ما انرسلت. جرّب مرة ثانية.";
   }
