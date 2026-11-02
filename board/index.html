@@ -10,7 +10,7 @@
   --wall:#2C3B38; --floor:#F1F3EE; --floor-alt:#E9EDE6; --corridor:#DDE3DC;
   --accent:#0D6B62; --accent-soft:#D3E7E3; --amber:#B8741A; --amber-soft:#F3E3C8;
   --ok:#2E7A49; --warn:#A8701B; --bad:#B23A2E; --wait:#5845A8; --off:#8C9893;
-  --d-ceo:#3F4A8C; --d-it:#1C7486; --d-dev:#8B5A1C; --d-marketing:#A13B5B; --d-other:#5B6A66;
+  --d-ceo:#3F4A8C; --d-it:#1C7486; --d-dev:#8B5A1C; --d-marketing:#A13B5B; --d-other:#5B6A66; --d-legal:#5E4E8C; --d-accounting:#2F7A5E; --d-audit:#8C5A2B;
   --f-display:"Readex Pro","IBM Plex Sans Arabic",Tahoma,sans-serif;
   --f-body:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
@@ -149,6 +149,53 @@ header.top{display:flex;flex-wrap:wrap;align-items:center;gap:16px 24px;justify-
 
 
 [hidden]{display:none!important}
+/* header actions + extras */
+.hdr-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;width:100%}
+.hbtn{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:99px;padding:6px 14px;cursor:pointer}
+.hbtn.pri{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.hbtn:disabled{opacity:.5;cursor:default}
+.cost-chip{margin-inline-start:auto}
+.annex .annex-cv{display:block;width:100%;min-width:820px;aspect-ratio:16/3;border-radius:10px;background:var(--o-corr)}
+.annex-btns{display:flex;flex-wrap:wrap;gap:8px}
+.brief-cap{position:absolute;inset:auto 24px 24px 24px;text-align:center;font-family:var(--f-display);font-weight:600;font-size:15px;color:#fff;background:rgba(10,16,18,.72);border-radius:12px;padding:10px 16px;z-index:3}
+.floor-shell{position:relative}
+.cost{display:grid;gap:12px}
+.cost-top{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cost-top>div{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;display:grid}
+.cost-top b{font-size:20px;font-weight:500}.cost-top span{font-size:12px;color:var(--muted)}
+.cost-bars{display:grid;gap:6px}
+.cost-row{display:grid;grid-template-columns:110px minmax(0,1fr) 48px;gap:8px;align-items:center;font-size:12.5px}
+.cost-row .bar{height:8px}.cost-row .bar i{background:var(--accent)}
+.cost-list{display:grid;gap:4px;font-size:12.5px;color:var(--muted)}
+.cost-item{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding-block:3px}
+.cost-item span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:80;background:#14201e;color:#fff;border-radius:12px;padding:10px 16px;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.3);max-width:calc(100% - 32px)}
+/* swipe deck */
+.deck{position:fixed;inset:0;z-index:55;background:radial-gradient(120% 90% at 50% 10%,#173a36,#0b1214 70%);color:#fff;display:grid;grid-template-rows:auto 1fr auto auto;padding:calc(12px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));gap:12px;overflow:hidden}
+.deck-top{display:flex;justify-content:space-between;gap:8px}
+.deck-stack{position:relative;display:grid;place-items:center;min-height:0}
+.deck-card{position:absolute;width:min(420px,100%);min-height:min(420px,60vh);background:#f7f8f4;color:#1b2826;border-radius:22px;padding:22px;display:grid;align-content:start;gap:12px;box-shadow:0 20px 50px rgba(0,0,0,.4);transform:translateY(calc(var(--i,0) * 14px)) scale(calc(1 - var(--i,0) * .05));transition:transform .25s,opacity .25s;touch-action:none;user-select:none;cursor:grab}
+.deck-card h3{font-size:21px;line-height:1.4}
+.deck-card p{margin:0;font-size:15px;color:#4a5854;line-height:1.7}
+.deck-kind{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.deck-from{font-size:13px;font-weight:600;color:#fff;background:var(--dc,#5B6A66);border-radius:99px;padding:2px 10px}
+.deck-reply{width:100%;min-height:70px;border:1px solid #c3cdc7;border-radius:12px;padding:8px 10px;font:inherit;font-size:14px;background:#fff;color:#1b2826;resize:vertical}
+.deck-reply.need{border-color:#B23A2E;box-shadow:0 0 0 3px rgba(178,58,46,.15)}
+.deck-stamp{position:absolute;top:26px;font-family:var(--f-display);font-weight:700;font-size:26px;border:4px solid;border-radius:10px;padding:2px 12px;opacity:0;transform:rotate(-12deg);pointer-events:none}
+.deck-stamp.ok{left:22px;color:#2E7A49}.deck-stamp.no{right:22px;color:#B23A2E;transform:rotate(12deg)}
+.deck-card.go-ok .deck-stamp.ok,.deck-card.go-no .deck-stamp.no{opacity:1}
+.deck-hint{direction:ltr;display:flex;justify-content:space-between;font-size:12.5px;color:rgba(255,255,255,.7);max-width:420px;width:100%;margin:0 auto}
+.deck-btns{direction:ltr;display:flex;justify-content:center;gap:18px}
+.deck-b{width:60px;height:60px;border-radius:50%;border:2px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);color:#fff;font-size:24px;cursor:pointer}
+.deck-b.ok{border-color:#5BC07E;color:#5BC07E}.deck-b.no{border-color:#EE6C5E;color:#EE6C5E}
+.deck-done{display:grid;gap:6px;text-align:center}.deck-done b{font-family:var(--f-display);font-size:24px}
+.sig-wrap{position:absolute;inset:0;background:rgba(5,9,10,.7);display:grid;place-items:center;padding:16px;z-index:5}
+.sig{background:#f7f8f4;color:#1b2826;border-radius:18px;padding:18px;width:min(640px,100%);display:grid;gap:10px}
+.sig p{margin:0;color:#4a5854}
+.sig-pad{width:100%;height:auto;border:1px solid #c3cdc7;border-radius:12px;touch-action:none;background:#fff}
+.sig-row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.sig .vn-pill{color:#1b2826;background:#e9ece6;border-color:#c3cdc7}
+
 /* member actions + 3D entry */
 .mbtns{display:flex;gap:8px;flex-wrap:wrap}
 .mbtns .btn{flex:1;min-width:0}
@@ -232,6 +279,7 @@ footer.note{color:var(--muted);font-size:12.5px;text-align:center}
       <span class="conn" id="conn"><i></i><span id="connTxt">يتصل…</span></span>
     </div>
     <div class="tally" id="tally"></div>
+    <div class="hdr-actions" id="hdrActions"></div>
   </header>
 
   <section class="floor-shell" aria-label="مخطط المكتب">
@@ -302,7 +350,7 @@ const STATUS = {
   waiting_dept:{t:"ينتظر قسم",c:"var(--warn)"}, stuck:{t:"عالق",c:"var(--bad)"}, meeting:{t:"في اجتماع",c:"var(--d-ceo)"},
   learning:{t:"يتعلم",c:"var(--d-it)"}, break:{t:"استراحة چاي",c:"var(--amber)"}, off:{t:"خارج الدوام",c:"var(--off)"}
 };
-const DEPT = { ceo:"الإدارة", it:"تكنولوجيا المعلومات", dev:"التطوير والحلول الذكية", marketing:"التسويق" };
+const DEPT = { ceo:"الإدارة", it:"تكنولوجيا المعلومات", dev:"التطوير والحلول الذكية", marketing:"التسويق", legal:"القانونية", accounting:"المحاسبة", audit:"التدقيق الداخلي" };
 const MOOD = { focused:"مركّز", happy:"مبسوط", calm:"رايق", tired:"تعبان", stressed:"مضغوط" };
 const LEVELS = [["متدرب",0],["مبتدئ",30],["مساعد",80],["أخصائي",150],["أول",250],["قائد",380],["خبير",550],["رئيس",750],["بروفيسور",1000],["أسطورة",1300]];
 const TASKS = [["todo","بالانتظار"],["doing","قيد العمل"],["review","مراجعة"],["done","تم"]];
@@ -327,7 +375,9 @@ function tickClock(){ const n = new Date(); $("clock").textContent = fT.format(n
 tickClock(); setInterval(tickClock, 15000);
 
 /* ---------- state ---------- */
-const S = { staff:[], events:[], tasks:[], needs:[], meetings:[], inbox:[], chats:[], sel:null, canWrite:null, loaded:{} };
+const deskHooks = [], overlayHooks = [];
+const ANNEX_DEPTS = new Set(["legal","accounting","audit"]);
+const S = { staff:[], events:[], tasks:[], needs:[], meetings:[], inbox:[], chats:[], costs:[], screenlog:[], config:[], sel:null, canWrite:null, loaded:{} };
 function visualStatus(s){
   if (s.status === "off") return "off";
   const d = toD(s.updated_at);
@@ -482,9 +532,10 @@ function decide(rec){
 function placeAt(rec, spot, act){ rec.spot = spot; rec.pos = {x:spot.x, y:spot.y}; rec.room = spot.room; rec.path = []; rec.nextAct = act; rec.dur = rand(15,40); arrive(rec); }
 
 function renderPeople(){
-  const ids = new Set(S.staff.map(s => s.id));
+  const floorStaff = S.staff.filter(s => !ANNEX_DEPTS.has(s.dept));
+  const ids = new Set(floorStaff.map(s => s.id));
   for (const id of [...recs.keys()]) if (!ids.has(id)) recs.delete(id);
-  for (const s of S.staff){
+  for (const s of floorStaff){
     const st = visualStatus(s);
     let rec = recs.get(s.id);
     if (!rec){
@@ -647,6 +698,7 @@ function drawStation(c, st, t){
   c.fillStyle = "#F7E58A"; c.fillRect(d.x + d.w - 18, d.y + 8, 10, 10); c.fillStyle = "#F2B6C3"; c.fillRect(d.x + d.w - 15, d.y + 20, 10, 10);
   if (st.big){ c.fillStyle = "#F3F1EC"; c.fillRect(d.x + 12, d.y + 10, 22, 16); c.fillStyle = P.amber; ell(c, d.x + d.w - 26, d.y + 40, 9, 9); c.fill(); c.fillStyle = P.dark ? "#FFE9A8" : "#FFF3C4"; ell(c, d.x + d.w - 26, d.y + 40, 5, 5); c.fill();
     c.fillStyle = P.accent; c.font = FD(600, 9); c.textAlign = "center"; c.direction = "rtl"; c.fillText("المدير", cx, d.y + d.h - 10); }
+  for (const f of deskHooks) { try { f(c, st, t, occ); } catch (e) {} }
 }
 function drawChair(c, sp, front){
   const {x, y} = sp;
@@ -793,6 +845,7 @@ function draw(t){
   for (const rec of recs.values()){ const s = staffById(rec.id); if (s && rec.visible) items.push({y: rec.pos.y + (rec.pose === "sit" && rec.face === "down" ? -1 : 0), f: () => drawPerson(c, rec, s, t)}); }
   items.sort((a, b) => a.y - b.y); for (const it of items) it.f();
   for (const rec of recs.values()){ const s = staffById(rec.id); if (s && rec.visible) drawTags(c, rec, s, t); }
+  for (const f of overlayHooks) { try { f(c, t); } catch (e) {} }
   const offN = S.staff.filter(s => visualStatus(s) === "off").length;
   if (offN){ c.direction = "rtl"; c.textAlign = "center"; c.font = FD(600, 10); c.fillStyle = P["o-label"]; c.fillText(`خارج الدوام: ${offN}`, 36, 470 + 10); }
   if (S.loaded.staff && !S.staff.length){ c.font = FD(600, 18); c.fillStyle = P["o-label"]; c.textAlign = "center"; c.direction = "rtl"; c.fillText("المكتب فاضي. الفريق يسجّل حضوره أول ما المدير يكتب ملفاتهم.", W/2, CMID); }
@@ -1008,6 +1061,9 @@ $("compose").addEventListener("submit", async (ev) => {
   sub("meetings", db.collection("meetings").orderBy("started_at","desc").limit(3));
   sub("inbox", db.collection("inbox").orderBy("at","desc").limit(30));
   sub("chats", db.collection("chats").where("read","==",false).limit(100));
+  sub("costs", db.collection("costs").orderBy("at","desc").limit(300));
+  sub("screenlog", db.collection("screenlog").orderBy("at","desc").limit(120));
+  sub("config", db.collection("config"));
 })();
 setInterval(() => { renderTeam(); renderTally(); }, 60000);
 let SAMPLE = null;
@@ -1015,7 +1071,7 @@ let SAMPLE = null;
 function drawPortrait(c, s){ const rec = { pos:{x:0,y:0}, pose:"stand", face:"down", act:null, walk:0, seed:1, bubble:null }; drawPerson(c, rec, s, T()); }
 const shirtOf = (s) => P["d-" + (DEPT[s.dept] ? s.dept : "other")];
 window.PHI = { h, get S(){ return S; }, recs, staffById, visualStatus, lookOf, shirtOf, dc, STATUS, DEPT, ROOMS, W, H, CY1, CY2, DOORW, P, ALL_STATIONS, MEET_SPOTS, LIB_SPOTS,
-  drawScreen, screenMode, occupantOf, roomOf, bagHour, tm, drawPortrait, onData, get DB(){ return DB; }, get SAMPLE(){ return SAMPLE; } };
+  drawScreen, screenMode, occupantOf, roomOf, bagHour, tm, drawPortrait, onData, deskHooks, overlayHooks, ell, fillRR, rr, FD, drawPerson, get DB(){ return DB; }, get SAMPLE(){ return SAMPLE; } };
 const e3 = $("enter3d");
 for (const [k, r] of Object.entries(ROOMS)) e3.append(h("button",{class:"btn",type:"button",onclick:()=>window.PHI3D && window.PHI3D.open(k)}, r.label));
 })();
@@ -1023,3 +1079,4 @@ for (const [k, r] of Object.entries(ROOMS)) e3.append(h("button",{class:"btn",ty
 <script src="figure3d.js"></script>
 <script src="vn.js"></script>
 <script src="office3d.js"></script>
+<script src="extras.js"></script>

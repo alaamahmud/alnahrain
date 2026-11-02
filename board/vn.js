@@ -154,6 +154,7 @@
   async function onChoice(ch){
     if (busy) return;
     const s = staff(); if (!s) return;
+    if (ch.kind === "fn"){ try { ch.fn(); } catch (e) {} return; }
     if (ch.kind === "screen"){ openScreen(s.id); return; }
     if (ch.kind === "focus"){ input.focus(); return; }
     if (ch.kind === "approve_need" || ch.kind === "reject_need" || ch.kind === "answer_need"){
@@ -242,7 +243,7 @@
     bg.style.setProperty("--dc", PHI.dc(s.dept));
   }
 
-  async function open(id){
+  async function open(id, opts){
     const s = PHI.staffById(id); if (!s) return;
     if (cur !== id){ turns = []; }
     cur = id; vn.hidden = false; document.documentElement.style.overflow = "hidden";
@@ -257,7 +258,8 @@
       } catch (e) {}
     }
     renderHist();
-    say(openingText(s), s.mood === "stressed" ? "stressed" : s.mood === "happy" ? "happy" : "calm", openingChoices(s));
+    if (opts && opts.intro) say(opts.intro, "happy", opts.choices || openingChoices(s));
+    else say(openingText(s), s.mood === "stressed" ? "stressed" : s.mood === "happy" ? "happy" : "calm", openingChoices(s));
     setTimeout(() => btnBack.focus(), 50);
   }
   function close(){
@@ -291,7 +293,8 @@
     const st = PHI.visualStatus(s);
     termTitle.textContent = `${termId}@phi-office: ~ — ${s.name}`;
     termBody.textContent = "";
-    const lines = (s.screen || []).slice(-24);
+    const live = (PHI.S.screenlog || []).filter(l => l.who === termId).slice().sort((a, b) => String(a.at || "").localeCompare(String(b.at || "")));
+    const lines = [...(s.screen || []), ...live].slice(-30);
     if (!lines.length) termBody.append(h("div", {class:"tl note"}, "# ماكو نشاط مسجل على هاي الشاشة بعد."));
     lines.forEach((l, i) => {
       const cls = "tl " + (l.kind || "out");

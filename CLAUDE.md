@@ -14,6 +14,9 @@
 - المالك يعطي الشغل في **اجتماع** (`team/rituals/meeting.md`). سجّل المحضر على اللوحة حياً.
 - وزّع الشغل على الموظفين عبر الـ agents في `.claude/agents/` (it-infra, it-support, dev, qa, ai-engineer, content-writer, seo-marketer, sales).
 - كل agent يرجع تقريراً موحداً + سطر JSON لتحديث اللوحة (ومعه `screen`: أوامره وملفاته الفعلية). أنت تكتبه على اللوحة بـ `ArtifactData` مع `if_version`، وتضيف أسطر `screen` لآخر 24 سطر.
+- **أثناء تشغيل الموظفين بالخلفية:** شغّل `python3 tools/live-watch.py` كـ Monitor، وانقل كل سطر يوصلك لـ `screenlog` على اللوحة (الشاشة الحية).
+- **بعد كل تشغيل:** سجّل `subagent_tokens` بـ `costs`، وإذا الموظف سلّم شغل لزميل اكتب حدث `handoff` بحقل `file`.
+- **إذا ضغط المالك «ابدأ بناء» قسم بالملحق:** افتحه حسب `team/board-protocol.md` (config/office).
 - ارفع للمالك فقط ما يحتاج قراره: ملخص قصير + القرارات المطلوبة + 3 أمور إضافية كحد أقصى.
 
 ## قواعد لا تُكسر
